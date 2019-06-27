@@ -1,5 +1,6 @@
 package com.adamratzman.math.rules
 
+import ch.obermuhlner.math.big.BigDecimalMath
 import java.math.BigDecimal
 import java.math.MathContext
 
@@ -61,17 +62,31 @@ class Precedence {
     }
 }
 
+/*
 
-abstract class MathValue {
-    abstract fun add(mathValue: MathValue): MathValue
-    abstract fun subtract(mathValue: MathValue): MathValue
-    abstract fun multiply(mathValue: MathValue): MathValue
-    abstract fun divide(mathValue: MathValue): MathValue
+abstract class MathValue(val context: MathContext) {
+    abstract fun add(other: MathValue): MathValue
+    abstract fun subtract(other: MathValue): MathValue
+    abstract fun multiply(other: MathValue): MathValue
+    abstract fun divide(other: MathValue): MathValue
 
-    abstract fun exponent(mathValue: MathValue): MathValue
+    open fun pow(other: MathValue): MathValue {
+        return BigDecimalMath.pow(getDecimalApproximation(), other.getDecimalApproximation(), context)
+            .toDecimal(context)
+    }
+
+    abstract fun getDecimalApproximation(): BigDecimal
+}
+
+
+// class Fraction(val numerator: BigDecimal, val denominator: BigDecimal) : MathValue()
+
+class Decimal(val number: BigDecimal, context: MathContext) : MathValue(context) {
 
 }
 
-//class Fraction(val numerator: BigDecimal, val denominator: BigDecimal) : MathValue()
-class Number(val number: BigDecimal)
-class Constant()
+class Fraction(val numerator: BigDecimal, val denominator: BigDecimal, context: MathContext) : MathValue(context)
+
+fun BigDecimal.toDecimal(context: MathContext) = Decimal(this, context)
+
+class Constant()*/

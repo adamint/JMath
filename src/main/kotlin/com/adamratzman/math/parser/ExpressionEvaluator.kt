@@ -8,36 +8,22 @@ import java.math.BigDecimal
 import java.math.MathContext
 import java.util.*
 
-class ExpressionEvaluator(val programInput: String, val tokenizedProgram: List<Token>, val context: MathContext) {
+class ExpressionEvaluator(programInput: String, tokenizer: ExpressionTokenizer, context: MathContext)
+    : AbstractEvaluator(programInput,tokenizer, context){
+
     constructor(programInput: String, context: MathContext) : this(
         programInput,
-        ExpressionTokenizer(context).tokenize(programInput),
+        ExpressionTokenizer(context),
         context
     )
 
-    val variables = mutableMapOf<String, (ExpressionEvaluator) -> BigDecimal>()
 
-    fun runPreEvaluationChecks(): List<Token> {
-        val tokens = tokenizedProgram.toMutableList()
-
-        variables.forEach { variable ->
-            tokens.mapIndexedNotNull { i, token ->
-                if (token is VariableToken && token.token == variable.key) i
-                else null
-            }.forEach { indexToChange ->
-                tokens[indexToChange] = NumberToken(variable.value(this).toPlainString())
-            }
-        }
+    override fun evaluate(): BigDecimal {
+        val tokens = replaceVariables()
 
         if (tokens.any { it is VariableToken }) {
             throw IllegalArgumentException("Tokenized program $tokens contained variable token(s)")
         }
-
-        return tokens
-    }
-
-    fun evaluate(): BigDecimal {
-        val tokens = runPreEvaluationChecks()
 
         val stack = Stack<Any>()
 
@@ -136,10 +122,5 @@ class ExpressionEvaluator(val programInput: String, val tokenizedProgram: List<T
         if (stack.size != 1) throw IllegalStateException("Stack size not 1 at end of evaluation: $stack")
 
         return stack[0] as BigDecimal
-    }
-
-    fun inputToString(strictRpnNotation: Boolean = true): String {
-        return if (!strictRpnNotation) runPreEvaluationChecks().toString()
-        else runPreEvaluationChecks().joinToString(" ") { if (it is UnaryOperator) "u${it.token}" else it.token }
     }
 }
