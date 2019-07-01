@@ -7,15 +7,16 @@ import java.math.MathContext
 import java.util.*
 
 class ExpressionTokenizer(var mathContext: MathContext, additionalMathFunctions: List<MathFunction>? = null) {
-    private val operators = getOperators()
-    private val unaryOperators = getUnaryOperators()
+    val operators = getOperators().toMutableList()
+    val unaryOperators = getUnaryOperators().toMutableList()
 
-    private val internalFunctions = getFunctions()
-    private val allMathFunctions: List<MathFunction> = internalFunctions + (additionalMathFunctions ?: listOf())
+    val internalFunctions = getFunctions()
 
-    private val constants = getSimpleConstants()
+    val allMathFunctions: List<MathFunction> = internalFunctions + (additionalMathFunctions ?: listOf())
 
-    private val globalTokens = operators + unaryOperators + allMathFunctions
+    val constants = getSimpleConstants().toMutableList()
+
+    val globalTokens = operators + unaryOperators + allMathFunctions
 
     private fun isDigit(char: Char) = char in '0'..'9' || char == '.'
     private fun isLetter(char: Char) = char in 'a'..'z' || char in 'A'..'Z'
