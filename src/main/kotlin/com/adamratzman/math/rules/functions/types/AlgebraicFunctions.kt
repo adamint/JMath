@@ -30,7 +30,7 @@ class Remainder : MathFunction("remainder", FunctionType.ALGEBRAIC, 2, aliases =
 
 class Root : MathFunction(
     "nroot", FunctionType.ALGEBRAIC, 2, 2,
-    FunctionOverloadDescription("number, root", "Computes first^(1/root)")
+    FunctionOverloadDescription("number, root", description = "Computes first^(1/root)")
 ) {
     override fun compute(parameters: List<BigDecimal>, evaluator: ExpressionEvaluator): BigDecimal {
         return BigDecimalMath.root(parameters[0], parameters[1], evaluator.context)
@@ -51,7 +51,7 @@ class Abs : MathFunction("absolute", FunctionType.ALGEBRAIC, 1, aliases = listOf
 
 class Pow : MathFunction(
     "pow", FunctionType.ALGEBRAIC, 2, 2,
-    FunctionOverloadDescription("first, second", "Computes first^second"),
+    FunctionOverloadDescription("first, second", description = "Computes first^second"),
     aliases = listOf("power")
 ) {
     override fun compute(parameters: List<BigDecimal>, evaluator: ExpressionEvaluator): BigDecimal {
@@ -79,7 +79,7 @@ class Reciprocal : MathFunction("reciprocal", FunctionType.ALGEBRAIC, 1) {
 
 class Binomial : MathFunction(
     "binomial", FunctionType.ALGEBRAIC, 2, 2,
-    FunctionOverloadDescription("n, k", "Computes n! / (k! (n - k)!)")
+    FunctionOverloadDescription("n, k", description = "Computes n! / (k! (n - k)!)")
 ) {
     override fun compute(parameters: List<BigDecimal>, evaluator: ExpressionEvaluator): BigDecimal {
         return BigIntegerMath.binomial(parameters[0].toInt(), parameters[1].toInt()).toBigDecimal()
