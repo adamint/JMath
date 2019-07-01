@@ -1,8 +1,8 @@
 package com.adamratzman.math.rules
 
 import ch.obermuhlner.math.big.BigDecimalMath
+import com.adamratzman.math.parser.ExpressionEvaluator
 import java.math.BigDecimal
-import java.math.MathContext
 
 abstract class Token(
     val token: String,
@@ -32,7 +32,15 @@ abstract class OperatorToken(
     val minParameterAmount: Int = maxParameterAmount,
     associativity: Associativity = Associativity.LEFT_ASSOCIATIVE
 ) : StackableToken(token, precedence, associativity) {
-    abstract fun compute(parameters: List<BigDecimal>, context: MathContext): BigDecimal
+    internal fun computeInternal(parameters: List<BigDecimal>, evaluator: ExpressionEvaluator): BigDecimal {
+        return if (evaluator.withRadix == 10) compute(parameters, evaluator)
+        else compute(
+            parameters.map { it.toLong().toString().toLong(evaluator.withRadix).toBigDecimal() },
+            evaluator
+        ).toString().toLong().toString(evaluator.withRadix).toBigDecimal()
+    }
+
+    abstract fun compute(parameters: List<BigDecimal>, evaluator: ExpressionEvaluator): BigDecimal
 }
 
 abstract class FunctionToken(
@@ -40,7 +48,15 @@ abstract class FunctionToken(
     val maxParameterAmount: Int,
     val minParameterAmount: Int = maxParameterAmount
 ) : StackableToken(token, Precedence.functionPrecedence) {
-    abstract fun compute(parameters: List<BigDecimal>, context: MathContext): BigDecimal
+    internal fun computeInternal(parameters: List<BigDecimal>, evaluator: ExpressionEvaluator): BigDecimal {
+        return if (evaluator.withRadix == 10) compute(parameters, evaluator)
+        else compute(
+            parameters.map { it.toLong().toString().toLong(evaluator.withRadix).toBigDecimal() },
+            evaluator
+        ).toString().toLong().toString(evaluator.withRadix).toBigDecimal()
+    }
+
+    abstract fun compute(parameters: List<BigDecimal>, evaluator: ExpressionEvaluator): BigDecimal
 }
 
 abstract class UnstackableToken(token: String, name: String) : Token(
@@ -62,7 +78,7 @@ class Precedence {
     }
 }
 
-/*
+/* 
 
 abstract class MathValue(val context: MathContext) {
     abstract fun add(other: MathValue): MathValue

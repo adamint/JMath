@@ -3,8 +3,6 @@ package com.adamratzman.math.parser
 import com.adamratzman.math.rules.*
 import com.adamratzman.math.rules.constants.getSimpleConstants
 import com.adamratzman.math.rules.functions.*
-import com.adamratzman.math.rules.functions.functionMarker
-import com.adamratzman.math.rules.functions.leftParenthesis
 import java.math.MathContext
 import java.util.*
 
@@ -84,7 +82,11 @@ class ExpressionTokenizer(var mathContext: MathContext, additionalMathFunctions:
                 isLeftParenthesis(char) -> {
                     flushBuffers(numberBuffer, letterBuffer, tokens, operatorStack)
 
-                    if (tokens.lastOrNull() is NumberToken && input.substring(i - tokens.last().token.length, i) == tokens.last().token) {
+                    if (tokens.lastOrNull() is NumberToken && input.substring(
+                            i - tokens.last().token.length,
+                            i
+                        ) == tokens.last().token
+                    ) {
                         // this will allow y(f(x)), where y is a number
                         return tokenize(input.substring(0, i) + "*" + input.substring(i))
                     }
@@ -119,6 +121,8 @@ class ExpressionTokenizer(var mathContext: MathContext, additionalMathFunctions:
         while (operatorStack.isNotEmpty()) {
             tokens.add(operatorStack.pop())
         }
+
+        tokens.removeAll { it == leftParenthesis }
 
         return tokens
     }
@@ -171,7 +175,7 @@ class ExpressionTokenizer(var mathContext: MathContext, additionalMathFunctions:
                                 string,
                                 !it.caseSensitive
                             )
-                        }.generate(mathContext).toPlainString())
+                        }.generate(this).toPlainString())
                     )
                     else -> tokens.add(VariableToken(string))
                 }
@@ -182,5 +186,6 @@ class ExpressionTokenizer(var mathContext: MathContext, additionalMathFunctions:
         }
     }
 
-    internal fun getEvaluator(input: String) = ExpressionEvaluator(input, tokenize(input), mathContext)
+    internal fun getEvaluator(input: String, useRadians: Boolean = true, radix: Int = 10) =
+        ExpressionEvaluator(input, this, mathContext, useRadians, radix)
 }

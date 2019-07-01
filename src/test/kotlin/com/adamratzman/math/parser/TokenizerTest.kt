@@ -21,10 +21,10 @@ internal class TokenizerTest {
     @Test
     fun evaluate() {
         val evaluator = tokenizer.getEvaluator("31 + 4*36 * 22 / (1 - sin(5)) ^ 2 ^ 36")
-        evaluator.variables["y"] = { _ -> 36.toBigDecimal() }
+        evaluator.variables["y"] = { 36.toBigDecimal() }
 
         println("Infix: ${evaluator.programInput}")
-        println("Postfix: ${evaluator.inputToString()}")
+        println("Postfix: $evaluator")
 
         println(evaluator.evaluate().round(6).trim())
     }
@@ -34,7 +34,7 @@ internal class TokenizerTest {
         val evaluator = tokenizer.getEvaluator("-31(-4)+---9")
 
         println("Infix: ${evaluator.programInput}")
-        println("Postfix: ${evaluator.inputToString()}")
+        println("Postfix: $evaluator")
 
         println(evaluator.evaluate().round(6).trim())
     }

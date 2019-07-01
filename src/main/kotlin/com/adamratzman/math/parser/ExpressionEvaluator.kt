@@ -2,19 +2,26 @@ package com.adamratzman.math.parser
 
 import ch.obermuhlner.math.big.BigDecimalMath
 import com.adamratzman.math.rules.*
-import com.adamratzman.math.rules.functions.UnaryOperator
 import com.adamratzman.math.rules.functions.functionMarker
 import java.math.BigDecimal
 import java.math.MathContext
 import java.util.*
 
-class ExpressionEvaluator(programInput: String, tokenizer: ExpressionTokenizer, context: MathContext)
-    : AbstractEvaluator(programInput,tokenizer, context){
+class ExpressionEvaluator(
+    programInput: String,
+    tokenizer: ExpressionTokenizer,
+    context: MathContext,
+    val useRadians: Boolean,
+    val withRadix: Int = 10
+) :
+    AbstractEvaluator(programInput, tokenizer, context) {
 
-    constructor(programInput: String, context: MathContext) : this(
+    constructor(programInput: String, context: MathContext, useRadians: Boolean, withRadix: Int = 10) : this(
         programInput,
         ExpressionTokenizer(context),
-        context
+        context,
+        useRadians,
+        withRadix
     )
 
 
@@ -59,7 +66,7 @@ class ExpressionEvaluator(programInput: String, tokenizer: ExpressionTokenizer, 
                             throw IllegalArgumentException("Argument size for $token (${arguments.size}) different than allowed.")
                         }
 
-                        stack.push(token.compute(arguments, context))
+                        stack.push(token.computeInternal(arguments, this))
                     }
                     is OperatorToken -> {
                         if (stack.size < token.minParameterAmount) {
@@ -84,14 +91,14 @@ class ExpressionEvaluator(programInput: String, tokenizer: ExpressionTokenizer, 
 
                         if (arguments.size !in token.minParameterAmount..token.maxParameterAmount) {
                             throw IllegalArgumentException(
-                                "Stack for operator $token doesn't contain the correct " +
+                                "Stack $stack for operator $token doesn't contain the correct " +
                                         "amount of parameters (${token.minParameterAmount}..${token.maxParameterAmount})"
                             )
                         }
 
                         arguments.reverse()
 
-                        stack.push(token.compute(arguments, context))
+                        stack.push(token.computeInternal(arguments, this))
 
 
                         /*val stackIndexOfLastFunctionMarker =
