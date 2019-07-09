@@ -6,7 +6,7 @@ import org.junit.Test
 import java.math.MathContext
 
 internal class TokenizerTest {
-    val tokenizer = ExpressionTokenizer(MathContext.DECIMAL128)
+    val tokenizer = ExpressionTokenizer(10, MathContext.DECIMAL128)
 
     @Test
     fun tokenize() {

@@ -6,7 +6,7 @@ import com.adamratzman.math.rules.functions.*
 import java.math.MathContext
 import java.util.*
 
-class ExpressionTokenizer(var mathContext: MathContext, additionalMathFunctions: List<MathFunction>? = null) {
+class ExpressionTokenizer(val base: Int = 10, var mathContext: MathContext, additionalMathFunctions: List<MathFunction>? = null) {
     val operators = getOperators().toMutableList()
     val unaryOperators = getUnaryOperators().toMutableList()
 
@@ -18,8 +18,14 @@ class ExpressionTokenizer(var mathContext: MathContext, additionalMathFunctions:
 
     val globalTokens = operators + unaryOperators + allMathFunctions
 
-    private fun isDigit(char: Char) = char in '0'..'9' || char == '.'
-    private fun isLetter(char: Char) = char in 'a'..'z' || char in 'A'..'Z'
+    private fun isDigit(char: Char): Boolean {
+        val allDigits = ('0'..'9') + ('A'..'Z')
+        val digitsForBase = allDigits.take(base)
+
+        return char in digitsForBase || char == '.'
+    }
+
+    private fun isLetter(char: Char) = !isDigit(char) && (char in 'a'..'z' || char in 'A'..'Z')
     private fun isIgnoredCharacter(char: Char) = char == ' '
     private fun isComma(char: Char) = char == ','
     private fun isDefinedToken(char: Char) = globalTokens.any { it.token == char.toString() }

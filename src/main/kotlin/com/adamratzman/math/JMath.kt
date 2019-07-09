@@ -10,7 +10,7 @@ data class Expression(
     val useRadians: Boolean = true,
     val radix: Int = 10,
     val mathContext: MathContext = MathContext.DECIMAL128,
-    val tokenizer: ExpressionTokenizer = ExpressionTokenizer(mathContext)
+    val tokenizer: ExpressionTokenizer = ExpressionTokenizer(radix, mathContext)
 ) {
     val evaluator: ExpressionEvaluator by lazy { tokenizer.getEvaluator(input, useRadians, radix) }
     val variables: MutableMap<String, () -> BigDecimal>

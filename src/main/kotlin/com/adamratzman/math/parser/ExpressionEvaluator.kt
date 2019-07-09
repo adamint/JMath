@@ -18,7 +18,7 @@ class ExpressionEvaluator(
 
     constructor(programInput: String, context: MathContext, useRadians: Boolean, withRadix: Int = 10) : this(
         programInput,
-        ExpressionTokenizer(context),
+        ExpressionTokenizer(withRadix, context),
         context,
         useRadians,
         withRadix
@@ -36,7 +36,10 @@ class ExpressionEvaluator(
 
         tokens.forEach { token ->
             if (token is UnstackableToken) {
-                if (token is NumberToken) stack.push(BigDecimalMath.toBigDecimal(token.token))
+                if (token is NumberToken) {
+                    if (withRadix == 10) stack.push(BigDecimalMath.toBigDecimal(token.token))
+                    else stack.push(token.token.toLong(withRadix).toBigDecimal(context))
+                }
                 else throw IllegalArgumentException("Unstackable $token is not a number")
             } else {
                 when (token) {
